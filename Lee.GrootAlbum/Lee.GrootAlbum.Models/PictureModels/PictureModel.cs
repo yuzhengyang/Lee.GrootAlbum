@@ -48,6 +48,10 @@ namespace Lee.GrootAlbum.Models.PictureModels
         /// </summary>
         public string Model { get; set; }
         /// <summary>
+        /// 照片方向
+        /// </summary>
+        public int Orientation { get; set; }
+        /// <summary>
         /// 经度 方向
         /// </summary>
         public char GpsLongitudeRef { get; set; }

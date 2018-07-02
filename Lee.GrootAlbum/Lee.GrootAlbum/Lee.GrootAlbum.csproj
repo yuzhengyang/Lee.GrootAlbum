@@ -70,12 +70,16 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Commons\R.Paths.cs" />
+    <Compile Include="Commons\R.Files.cs" />
+    <Compile Include="Commons\R.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Modules\PictureModule\PictureHandleQueue.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -102,10 +106,17 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Lee.GrootAlbum.Models\Lee.GrootAlbum.Models.csproj">
+      <Project>{4f6f4103-f78a-4f29-8258-2bdfcc9bad42}</Project>
+      <Name>Lee.GrootAlbum.Models</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Lee.GrootAlbum.Utils\Lee.GrootAlbum.Utils.csproj">
       <Project>{f1948849-150e-4569-9b0f-b1c1b57fa7bf}</Project>
       <Name>Lee.GrootAlbum.Utils</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Modules\PlanTaskModule\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

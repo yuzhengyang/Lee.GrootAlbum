@@ -1,6 +1,7 @@
 ﻿using Azylee.Core.DataUtils.GuidUtils;
 using Azylee.Core.DataUtils.StringUtils;
 using Azylee.Core.IOUtils.DirUtils;
+using Azylee.Core.IOUtils.ExifUtils;
 using Azylee.Core.IOUtils.FileUtils;
 using Azylee.Core.IOUtils.ImageUtils;
 using Lee.GrootAlbum.Models.PictureModels;
@@ -59,7 +60,7 @@ namespace Lee.GrootAlbum.Utils.PictureUtils
                     {
                         if (DateTime.TryParse(string.Format("{0} {1}", exifDTOrig[0].Replace(':', '-'), exifDTOrig[1]), out DateTime dt)) picture.OrigTime = dt;
                     }
-                    picture.Name = string.Format("{0}-{1}.{2}", picture.OrigTime.ToString("yyyyMMddhhmmss"), picture.MD5, picture.ExtName);
+                    picture.Name = string.Format("{0}-{1}{2}", picture.OrigTime.ToString("yyyyMMddhhmmss"), picture.MD5, picture.ExtName);
                 }
                 return picture;
             }
@@ -99,12 +100,28 @@ namespace Lee.GrootAlbum.Utils.PictureUtils
             {
                 if (File.Exists(file))
                 {
-                    //创建缩略图
-                    string thumb = DirTool.Combine(path, "thumb", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}", $"{picture.Model}",picture.Name);
+                    //根据照片信息旋转，生成临时文件
+                    string temp = DirTool.Combine(path, "temp");
+                    DirTool.Create(temp);
+                    string tempfile = DirTool.Combine(temp, picture.Name);
+                    RotateImageTool.Rotate(file, tempfile);
+
                     //创建压缩图
-                    string normal = DirTool.Combine(path, "normal", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}", $"{picture.Model}", picture.Name);
+                    string normal = DirTool.Combine(path, "normal", $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}");
+                    DirTool.Create(normal);
+                    ImageHelper.MakeThumbnail(tempfile, DirTool.Combine(normal, picture.Name), 1000, 1000, "H");
+
+                    //创建缩略图
+                    string thumb = DirTool.Combine(path, "thumb", $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}");
+                    DirTool.Create(thumb);
+                    ImageHelper.MakeThumbnail(tempfile, DirTool.Combine(thumb, picture.Name), 500, 500, "Cut");
+
                     //整理原始照片
-                    string high = DirTool.Combine(path, "high", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}", $"{picture.Model}", picture.Name);
+                    string original = DirTool.Combine(path, "original", $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}");
+                    DirTool.Create(original);
+                    File.Move(file, DirTool.Combine(original, picture.Name));
+
+                    FileTool.Delete(tempfile);
                     return true;
                 }
             }

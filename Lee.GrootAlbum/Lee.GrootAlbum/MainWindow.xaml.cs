@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Azylee.Core.DataUtils.CollectionUtils;
+using Azylee.Core.IOUtils.FileUtils;
+using Lee.GrootAlbum.Modules.PictureModule;
+using Lee.GrootAlbum.Utils.PictureUtils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -23,6 +27,8 @@ namespace Lee.GrootAlbum
         public MainWindow()
         {
             InitializeComponent();
+
+            PictureHandleQueue.Start();
         }
     }
 }
