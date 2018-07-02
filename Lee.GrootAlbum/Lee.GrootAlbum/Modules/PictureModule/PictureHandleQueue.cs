@@ -1,4 +1,5 @@
 ﻿using Azylee.Core.ThreadUtils.SleepUtils;
+using Azylee.DB.SQLite.Engine;
 using Lee.GrootAlbum.Commons;
 using Lee.GrootAlbum.Models.PictureModels;
 using Lee.GrootAlbum.Utils.PictureUtils;
@@ -37,31 +38,40 @@ namespace Lee.GrootAlbum.Modules.PictureModule
         {
             if (IsStart) return;
             IsStart = true;
-
-            //设置退出条件
-            while (!CancelToken.IsCancellationRequested)
+            Task.Factory.StartNew(() =>
             {
-                //如果通信正常，并且队列中存在元素
-                if (Queue.Any())
+                //设置退出条件
+                while (!CancelToken.IsCancellationRequested)
                 {
-                    //循环进行操作
-                    for (int i = 0; i < Queue.Count; i++)
+                    //如果通信正常，并且队列中存在元素
+                    if (Queue.Any())
                     {
-                        try
+                        //循环进行操作
+                        for (int i = 0; i < Queue.Count; i++)
                         {
-                            if (Queue.TryDequeue(out string file))
+                            try
                             {
-                                var pic = PictureReorganize.CreateModel(file);
-                                pic = PictureReorganize.AddLocationInfo(file, pic);
-                                pic = PictureReorganize.AddContentInfo(file, pic);
-                                PictureReorganize.ReorganizePicture(file, R.Paths.Pictures, pic);
+                                if (Queue.TryDequeue(out string file))
+                                {
+                                    var pic = PictureReorganize.CreateModel(file);
+                                    using (Muse db = new Muse("pictures"))
+                                    {
+                                        var rec = db.Get<PictureModel>(x => x.MD5 == pic.MD5 && x.SHA1 == pic.SHA1, null);
+                                        if (rec == null)
+                                        {
+                                            pic = PictureReorganize.AddLocationInfo(file, pic);
+                                            pic = PictureReorganize.AddContentInfo(file, pic);
+                                            PictureReorganize.ReorganizePicture(file, R.Paths.Pictures, pic);
+                                        }
+                                    }
+                                }
                             }
+                            catch { }
                         }
-                        catch { }
                     }
+                    Sleep.S(Interval);
                 }
-                Sleep.S(Interval);
-            }
+            });
         }
     }
 }

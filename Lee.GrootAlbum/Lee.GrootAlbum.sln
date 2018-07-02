@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lee.GrootAlbum.Utils", "Lee
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lee.GrootAlbum.Models", "Lee.GrootAlbum.Models\Lee.GrootAlbum.Models.csproj", "{4F6F4103-F78A-4F29-8258-2BDFCC9BAD42}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common.Utils", "Common.Utils", "{8A5FB17F-65C0-4546-B881-B727068F55BE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azylee.DB.SQLite", "Common.Utils\Azylee.DB.SQLite\Azylee.DB.SQLite.csproj", "{A77DBB5D-CA37-425C-8FA2-8B0736AE1C4D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,9 +31,16 @@ Global
 		{4F6F4103-F78A-4F29-8258-2BDFCC9BAD42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F6F4103-F78A-4F29-8258-2BDFCC9BAD42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F6F4103-F78A-4F29-8258-2BDFCC9BAD42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A77DBB5D-CA37-425C-8FA2-8B0736AE1C4D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A77DBB5D-CA37-425C-8FA2-8B0736AE1C4D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A77DBB5D-CA37-425C-8FA2-8B0736AE1C4D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A77DBB5D-CA37-425C-8FA2-8B0736AE1C4D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A77DBB5D-CA37-425C-8FA2-8B0736AE1C4D} = {8A5FB17F-65C0-4546-B881-B727068F55BE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {512FF778-D7FD-4324-89D6-4F835ED5050E}

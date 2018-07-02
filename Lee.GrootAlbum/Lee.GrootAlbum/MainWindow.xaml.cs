@@ -1,5 +1,8 @@
 ﻿using Azylee.Core.DataUtils.CollectionUtils;
+using Azylee.Core.DataUtils.GuidUtils;
 using Azylee.Core.IOUtils.FileUtils;
+using Azylee.DB.SQLite.Engine;
+using Lee.GrootAlbum.Models.PictureModels;
 using Lee.GrootAlbum.Modules.PictureModule;
 using Lee.GrootAlbum.Utils.PictureUtils;
 using System;
@@ -28,6 +31,7 @@ namespace Lee.GrootAlbum
         {
             InitializeComponent();
 
+            PictureFinder.Start();
             PictureHandleQueue.Start();
         }
     }
