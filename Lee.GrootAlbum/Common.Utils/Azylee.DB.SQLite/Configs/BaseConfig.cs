@@ -1,4 +1,5 @@
-﻿using Lee.GrootAlbum.Models.PictureModels;
+﻿using Lee.GrootAlbum.Models.DBModels;
+using Lee.GrootAlbum.Models.PictureModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -16,7 +17,7 @@ namespace Azylee.DB.SQLite.Configs
         }
         private static void ConfiguerUserEntity(DbModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<PictureModel>().HasKey(x => x.Id);
+            modelBuilder.Entity<Pictures>().HasKey(x => x.Id);
         }
     }
 }

@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
-namespace Lee.GrootAlbum.Models
+namespace Lee.GrootAlbum.Models.PictureModels
 {
-    public class Class1
+    public class QQAIPicture
     {
     }
 }

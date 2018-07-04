@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Lee.GrootAlbum.Models.PictureModels
+namespace Lee.GrootAlbum.Models.DBModels
 {
     /// <summary>
     /// 图片信息模型
     /// </summary>
-    public class PictureModel
+    public class Pictures
     {
         /// <summary>
         /// 唯一ID
@@ -27,10 +27,6 @@ namespace Lee.GrootAlbum.Models.PictureModels
         /// 图片扩展名
         /// </summary>
         public string ExtName { get; set; }
-        /// <summary>
-        /// 位置信息
-        /// </summary>
-        public string Place { get; set; }
         /// <summary>
         /// MD5码信息
         /// </summary>
@@ -68,12 +64,40 @@ namespace Lee.GrootAlbum.Models.PictureModels
         /// </summary>
         public double GpsLatitude { get; set; }
         /// <summary>
-        /// 标签
+        /// 位置信息
+        /// </summary>
+        public string Location { get; set; }
+        /// <summary>
+        /// 场景物体
+        /// </summary>
+        public string Scene { get; set; }
+        /// <summary>
+        /// 图片标签
         /// </summary>
         public string Tag { get; set; }
         /// <summary>
+        /// 看图说话
+        /// </summary>
+        public string Express { get; set; }
+        /// <summary>
+        /// 模糊度
+        /// </summary>
+        public bool Fuzzy { get; set; }
+        /// <summary>
+        /// 食物
+        /// </summary>
+        public bool Food { get; set; }
+        /// <summary>
+        /// 文本信息
+        /// </summary>
+        public string Text { get; set; }
+        /// <summary>
+        /// 多人脸个数
+        /// </summary>
+        public int  Multiface { get; set; }
+        /// <summary>
         /// 收藏
         /// </summary>
-        public int Star { get; set; }
+        public bool Star { get; set; }
     }
 }

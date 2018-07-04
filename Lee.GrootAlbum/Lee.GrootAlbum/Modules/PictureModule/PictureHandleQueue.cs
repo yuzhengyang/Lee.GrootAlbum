@@ -1,13 +1,12 @@
-﻿using Azylee.Core.ThreadUtils.SleepUtils;
+﻿using Azylee.Core.IOUtils.FileUtils;
+using Azylee.Core.ThreadUtils.SleepUtils;
 using Azylee.DB.SQLite.Engine;
 using Lee.GrootAlbum.Commons;
+using Lee.GrootAlbum.Models.DBModels;
 using Lee.GrootAlbum.Models.PictureModels;
 using Lee.GrootAlbum.Utils.PictureUtils;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,7 +16,7 @@ namespace Lee.GrootAlbum.Modules.PictureModule
     {
         static bool IsStart = false;
         static short Interval = 5;
-        public static CancellationToken CancelToken;
+        public static CancellationTokenSource Token = new CancellationTokenSource();
         private static ConcurrentQueue<string> Queue = new ConcurrentQueue<string>();
         public static void Add(string file)
         {
@@ -38,12 +37,13 @@ namespace Lee.GrootAlbum.Modules.PictureModule
         {
             if (IsStart) return;
             IsStart = true;
+
             Task.Factory.StartNew(() =>
             {
                 //设置退出条件
-                while (!CancelToken.IsCancellationRequested)
+                while (!Token.IsCancellationRequested)
                 {
-                    //如果通信正常，并且队列中存在元素
+                    //队列中存在元素
                     if (Queue.Any())
                     {
                         //循环进行操作
@@ -53,23 +53,28 @@ namespace Lee.GrootAlbum.Modules.PictureModule
                             {
                                 if (Queue.TryDequeue(out string file))
                                 {
-                                    R.Log.v(">>>>>>>>>> 准备处理文件：" + file);
+                                    R.Log.v("💗💗💗 准备处理文件：" + file);
                                     var pic = PictureReorganize.CreateModel(file);
                                     if (pic != null)
                                     {
-                                        R.Log.v("准备处理文件：" + file);
+                                        R.Log.v("图片信息读取成功");
                                         using (Muse db = new Muse("pictures"))
                                         {
-                                            var rec = db.Get<PictureModel>(x => x.MD5 == pic.MD5 && x.SHA1 == pic.SHA1, null);
-                                            if (rec == null)
+                                            if (db.Any<Pictures>(x => x.MD5 == pic.MD5 && x.SHA1 == pic.SHA1, null))
                                             {
+                                                R.Log.v("图片已入库，不需要在重复保存了，即将删除");
+                                                FileTool.Delete(file);
+                                            }
+                                            else
+                                            {
+                                                R.Log.v("图片未入库，准备入库并分类保存");
+                                                db.Add(pic);
                                                 pic = PictureReorganize.AddLocationInfo(file, pic);
                                                 pic = PictureReorganize.AddContentInfo(file, pic);
                                                 PictureReorganize.ReorganizePicture(file, R.Paths.Pictures, pic);
                                             }
                                         }
                                     }
-                                    R.Log.v("<<<<<<<<<< 文件处理完成");
                                 }
                             }
                             catch { }

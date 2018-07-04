@@ -4,13 +4,13 @@ using Azylee.Core.IOUtils.DirUtils;
 using Azylee.Core.IOUtils.ExifUtils;
 using Azylee.Core.IOUtils.FileUtils;
 using Azylee.Core.IOUtils.ImageUtils;
+using Azylee.Core.IOUtils.TxtUtils;
+using Azylee.Core.Plus.DataUtils.JsonUtils;
+using Lee.GrootAlbum.Models.DBModels;
 using Lee.GrootAlbum.Models.PictureModels;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lee.GrootAlbum.Utils.PictureUtils
 {
@@ -24,7 +24,7 @@ namespace Lee.GrootAlbum.Utils.PictureUtils
         /// </summary>
         /// <param name="file"></param>
         /// <returns></returns>
-        public static PictureModel CreateModel(string file)
+        public static Pictures CreateModel(string file)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace Lee.GrootAlbum.Utils.PictureUtils
                 string md5 = codetool.GetMD5(file);
                 string sha1 = codetool.GetSHA1(file);
 
-                PictureModel picture = new PictureModel()
+                Pictures picture = new Pictures()
                 {
                     Id = GuidTool.Short(),
                     ExtName = Path.GetExtension(file).ToUpper(),
@@ -74,7 +74,7 @@ namespace Lee.GrootAlbum.Utils.PictureUtils
         /// </summary>
         /// <param name="picture"></param>
         /// <returns></returns>
-        public static PictureModel AddLocationInfo(string file, PictureModel picture)
+        public static Pictures AddLocationInfo(string file, Pictures picture)
         {
             return picture;
         }
@@ -83,7 +83,7 @@ namespace Lee.GrootAlbum.Utils.PictureUtils
         /// </summary>
         /// <param name="picture"></param>
         /// <returns></returns>
-        public static PictureModel AddContentInfo(string file, PictureModel picture)
+        public static Pictures AddContentInfo(string file, Pictures picture)
         {
             return picture;
         }
@@ -94,32 +94,41 @@ namespace Lee.GrootAlbum.Utils.PictureUtils
         /// <param name="path">整理目标路径</param>
         /// <param name="picture">图片信息模型</param>
         /// <returns></returns>
-        public static bool ReorganizePicture(string file, string path, PictureModel picture)
+        public static bool ReorganizePicture(string file, string path, Pictures picture)
         {
             try
             {
                 if (File.Exists(file))
                 {
                     //根据照片信息旋转，生成临时文件
-                    string temp = DirTool.Combine(path, "temp");
+                    string temp = DirTool.Combine(path,"_data", "temp");
                     DirTool.Create(temp);
                     string tempfile = DirTool.Combine(temp, picture.Name);
+                    if (File.Exists(tempfile)) FileTool.Delete(tempfile);
                     RotateImageTool.Rotate(file, tempfile);
 
                     //创建压缩图
-                    string normal = DirTool.Combine(path, "normal", $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}");
+                    string normal = DirTool.Combine(path, "_data", "normal", $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}");
                     DirTool.Create(normal);
+                    if (File.Exists(DirTool.Combine(normal, picture.Name))) FileTool.Delete(DirTool.Combine(normal, picture.Name));
                     ImageHelper.MakeThumbnail(tempfile, DirTool.Combine(normal, picture.Name), 1000, 1000, "H");
 
                     //创建缩略图
-                    string thumb = DirTool.Combine(path, "thumb", $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}");
+                    string thumb = DirTool.Combine(path, "_data", "thumb", $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}");
                     DirTool.Create(thumb);
+                    if (File.Exists(DirTool.Combine(thumb, picture.Name))) FileTool.Delete(DirTool.Combine(thumb, picture.Name));
                     ImageHelper.MakeThumbnail(tempfile, DirTool.Combine(thumb, picture.Name), 500, 500, "Cut");
 
                     //整理原始照片
-                    string original = DirTool.Combine(path, "original", $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}");
+                    string original = DirTool.Combine(path, $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}");
                     DirTool.Create(original);
+                    if (File.Exists(DirTool.Combine(original, picture.Name))) FileTool.Delete(DirTool.Combine(original, picture.Name));
                     File.Move(file, DirTool.Combine(original, picture.Name));
+
+                    //整理照片基础信息
+                    string info = DirTool.Combine(path, "_data", "info", $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}");
+                    DirTool.Create(info);
+                    TxtTool.Create(DirTool.Combine(info, picture.Name + ".info"), JsonTool.ToStr(picture));
 
                     FileTool.Delete(tempfile);
                     return true;
