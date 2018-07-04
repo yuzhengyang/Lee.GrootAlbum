@@ -53,17 +53,23 @@ namespace Lee.GrootAlbum.Modules.PictureModule
                             {
                                 if (Queue.TryDequeue(out string file))
                                 {
+                                    R.Log.v(">>>>>>>>>> 准备处理文件：" + file);
                                     var pic = PictureReorganize.CreateModel(file);
-                                    using (Muse db = new Muse("pictures"))
+                                    if (pic != null)
                                     {
-                                        var rec = db.Get<PictureModel>(x => x.MD5 == pic.MD5 && x.SHA1 == pic.SHA1, null);
-                                        if (rec == null)
+                                        R.Log.v("准备处理文件：" + file);
+                                        using (Muse db = new Muse("pictures"))
                                         {
-                                            pic = PictureReorganize.AddLocationInfo(file, pic);
-                                            pic = PictureReorganize.AddContentInfo(file, pic);
-                                            PictureReorganize.ReorganizePicture(file, R.Paths.Pictures, pic);
+                                            var rec = db.Get<PictureModel>(x => x.MD5 == pic.MD5 && x.SHA1 == pic.SHA1, null);
+                                            if (rec == null)
+                                            {
+                                                pic = PictureReorganize.AddLocationInfo(file, pic);
+                                                pic = PictureReorganize.AddContentInfo(file, pic);
+                                                PictureReorganize.ReorganizePicture(file, R.Paths.Pictures, pic);
+                                            }
                                         }
                                     }
+                                    R.Log.v("<<<<<<<<<< 文件处理完成");
                                 }
                             }
                             catch { }
