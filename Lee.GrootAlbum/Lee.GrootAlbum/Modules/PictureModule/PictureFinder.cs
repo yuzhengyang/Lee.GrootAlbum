@@ -35,5 +35,20 @@ namespace Lee.GrootAlbum.Modules.PictureModule
                 }
             });
         }
+
+        /// <summary>
+        /// 获取带GPS信息的照片
+        /// </summary>
+        /// <returns></returns>
+        public static List<Pictures> GetPictures()
+        {
+            List<Pictures> list = new List<Pictures>();
+            using (Muse db = new Muse("pictures"))
+            {
+                var _temp = db.Gets<Pictures>(x => x.GpsLongitude != 0 && x.GpsLatitude != 0, null).ToList();
+                if (ListTool.HasElements(_temp)) list = _temp;
+            }
+            return list;
+        }
     }
 }

@@ -48,14 +48,6 @@ namespace Lee.GrootAlbum.Models.DBModels
         /// </summary>
         public int Orientation { get; set; }
         /// <summary>
-        /// 经度 方向
-        /// </summary>
-        public char GpsLongitudeRef { get; set; }
-        /// <summary>
-        /// 纬度 方向
-        /// </summary>
-        public char GpsLatitudeRef { get; set; }
-        /// <summary>
         /// 经度
         /// </summary>
         public double GpsLongitude { get; set; }

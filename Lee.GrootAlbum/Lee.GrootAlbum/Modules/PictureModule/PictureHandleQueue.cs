@@ -58,20 +58,31 @@ namespace Lee.GrootAlbum.Modules.PictureModule
                                     if (pic != null)
                                     {
                                         R.Log.v("图片信息读取成功");
-                                        using (Muse db = new Muse("pictures"))
+
+                                        if (PictureReorganize.Exist(file, R.Paths.Pictures, pic))
                                         {
-                                            if (db.Any<Pictures>(x => x.MD5 == pic.MD5 && x.SHA1 == pic.SHA1, null))
+                                            R.Log.v("图片已入库，不需要在重复保存了，即将删除");
+                                            FileTool.Delete(file);
+                                        }
+                                        else
+                                        {
+                                            using (Muse db = new Muse("pictures"))
                                             {
-                                                R.Log.v("图片已入库，不需要在重复保存了，即将删除");
-                                                FileTool.Delete(file);
-                                            }
-                                            else
-                                            {
-                                                R.Log.v("图片未入库，准备入库并分类保存");
-                                                db.Add(pic);
-                                                pic = PictureReorganize.AddLocationInfo(file, pic);
-                                                pic = PictureReorganize.AddContentInfo(file, pic);
-                                                PictureReorganize.ReorganizePicture(file, R.Paths.Pictures, pic);
+                                                if (db.Any<Pictures>(x => x.MD5 == pic.MD5 && x.SHA1 == pic.SHA1, null))
+                                                {
+                                                    R.Log.v("图片已入库，不需要在重复保存了，即将删除");
+                                                    FileTool.Delete(file);
+                                                }
+                                                else
+                                                {
+                                                    R.Log.v("图片未入库，准备入库并分类保存");
+                                                    if (db.Add(pic) > 0)
+                                                    {
+                                                        //pic = PictureReorganize.AddLocationInfo(pic);
+                                                        //pic = PictureReorganize.AddContentInfo(pic);
+                                                        PictureReorganize.ReorganizePicture(file, R.Paths.Pictures, pic);
+                                                    }
+                                                }
                                             }
                                         }
                                     }

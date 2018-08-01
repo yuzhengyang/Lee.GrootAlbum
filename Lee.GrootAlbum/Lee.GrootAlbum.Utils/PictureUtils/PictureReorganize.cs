@@ -6,6 +6,7 @@ using Azylee.Core.IOUtils.FileUtils;
 using Azylee.Core.IOUtils.ImageUtils;
 using Azylee.Core.IOUtils.TxtUtils;
 using Azylee.Core.Plus.DataUtils.JsonUtils;
+using Azylee.YeahWeb.BaiDuWebAPI.GPSAPI;
 using Lee.GrootAlbum.Models.DBModels;
 using Lee.GrootAlbum.Models.PictureModels;
 using System;
@@ -50,10 +51,10 @@ namespace Lee.GrootAlbum.Utils.PictureUtils
                     string model = ex.GetPropertyString((int)ExifTagNames.EquipModel).Trim().Replace(" ", "_");
                     picture.Model = (Str.Ok(maker) ? maker : Unknown) + "@" + (Str.Ok(model) ? model : Unknown);
 
-                    picture.GpsLongitudeRef = ex.GetPropertyChar((int)ExifTagNames.GpsLongitudeRef);
-                    picture.GpsLatitudeRef = ex.GetPropertyChar((int)ExifTagNames.GpsLatitudeRef);
-                    picture.GpsLongitude = ex.GetPropertyDouble((int)ExifTagNames.GpsLongitude) * (picture.GpsLongitudeRef.Equals('E') ? 1 : -1);
-                    picture.GpsLatitude = ex.GetPropertyDouble((int)ExifTagNames.GpsLatitude) * (picture.GpsLatitudeRef.Equals('N') ? 1 : -1);
+                    char GpsLongitudeRef = ex.GetPropertyChar((int)ExifTagNames.GpsLongitudeRef);
+                    char GpsLatitudeRef = ex.GetPropertyChar((int)ExifTagNames.GpsLatitudeRef);
+                    picture.GpsLongitude = ex.GetPropertyDouble((int)ExifTagNames.GpsLongitude) * (GpsLongitudeRef.Equals('E') ? 1 : -1);
+                    picture.GpsLatitude = ex.GetPropertyDouble((int)ExifTagNames.GpsLatitude) * (GpsLatitudeRef.Equals('N') ? 1 : -1);
 
                     string[] exifDTOrig = ex.GetPropertyString((int)ExifTagNames.ExifDTOrig).Trim().Split(' ');
                     if (exifDTOrig != null && exifDTOrig.Count() == 2)
@@ -74,8 +75,15 @@ namespace Lee.GrootAlbum.Utils.PictureUtils
         /// </summary>
         /// <param name="picture"></param>
         /// <returns></returns>
-        public static Pictures AddLocationInfo(string file, Pictures picture)
+        public static Pictures AddLocationInfo(Pictures picture)
         {
+            try
+            {
+                GPSInfoWebModel model = GPSInfoTool.GetInfo("", picture.GpsLongitude, picture.GpsLatitude);
+                string loc = model.ToGPSInfoModel().ToString();
+                picture.Location = loc;
+            }
+            catch { }
             return picture;
         }
         /// <summary>
@@ -83,7 +91,7 @@ namespace Lee.GrootAlbum.Utils.PictureUtils
         /// </summary>
         /// <param name="picture"></param>
         /// <returns></returns>
-        public static Pictures AddContentInfo(string file, Pictures picture)
+        public static Pictures AddContentInfo(Pictures picture)
         {
             return picture;
         }
@@ -101,7 +109,7 @@ namespace Lee.GrootAlbum.Utils.PictureUtils
                 if (File.Exists(file))
                 {
                     //根据照片信息旋转，生成临时文件
-                    string temp = DirTool.Combine(path,"_data", "temp");
+                    string temp = DirTool.Combine(path, "_data", "temp");
                     DirTool.Create(temp);
                     string tempfile = DirTool.Combine(temp, picture.Name);
                     if (File.Exists(tempfile)) FileTool.Delete(tempfile);
@@ -135,6 +143,18 @@ namespace Lee.GrootAlbum.Utils.PictureUtils
                 }
             }
             catch { return false; }
+            return false;
+        }
+        public static bool Exist(string file, string path, Pictures picture)
+        {
+            string normal = DirTool.Combine(DirTool.Combine(path, "_data", "normal", $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}"), picture.Name);
+            string thumb = DirTool.Combine(DirTool.Combine(path, "_data", "thumb", $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}"), picture.Name);
+            string original = DirTool.Combine(DirTool.Combine(path, $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}"), picture.Name);
+            string info = DirTool.Combine(DirTool.Combine(path, "_data", "info", $"{picture.Model}", $"{picture.OrigTime.Year}-{picture.OrigTime.Month}"), picture.Name + ".info");
+            if (File.Exists(normal) && File.Exists(thumb) && File.Exists(original) && File.Exists(info))
+            {
+                return true;
+            }
             return false;
         }
     }
